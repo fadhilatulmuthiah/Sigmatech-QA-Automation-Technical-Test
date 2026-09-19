@@ -1,0 +1,716 @@
+{
+  "info": {
+    "_postman_id": "1f5e22ee-42fc-4e3d-b70b-ea1f896305d9",
+    "name": "DummyJSON API Testing - Technical Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15838412"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "01 - Login - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains required fields\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"id\");\r",
+                  "    pm.expect(response).to.have.property(\"username\");\r",
+                  "    pm.expect(response).to.have.property(\"email\");\r",
+                  "    pm.expect(response).to.have.property(\"accessToken\");\r",
+                  "    pm.expect(response).to.have.property(\"refreshToken\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Username matches request payload\", function () {\r",
+                  "    const requestBody = JSON.parse(pm.request.body.raw);\r",
+                  "    pm.expect(response.username).to.eql(requestBody.username);\r",
+                  "});\r",
+                  "\r",
+                  "pm.environment.set(\"accessToken\", response.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"expiresInMins\": 30\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Login - Negative Invalid Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code indicates authentication failure\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Error response contains message\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"message\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{username}}\",\r\n  \"password\": \"wrongpassword\",\r\n  \"expiresInMins\": 30\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "03 - Get Users - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains required pagination fields\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"users\");\r",
+                  "    pm.expect(response).to.have.property(\"total\");\r",
+                  "    pm.expect(response).to.have.property(\"skip\");\r",
+                  "    pm.expect(response).to.have.property(\"limit\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Users is an array\", function () {\r",
+                  "    pm.expect(response.users).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"User object contains required fields\", function () {\r",
+                  "    pm.expect(response.users.length).to.be.above(0);\r",
+                  "\r",
+                  "    const user = response.users[0];\r",
+                  "\r",
+                  "    pm.expect(user).to.have.property(\"id\");\r",
+                  "    pm.expect(user).to.have.property(\"firstName\");\r",
+                  "    pm.expect(user).to.have.property(\"lastName\");\r",
+                  "    pm.expect(user).to.have.property(\"email\");\r",
+                  "    pm.expect(user).to.have.property(\"username\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Get Users - Negative Invalid Limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response status is captured\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response body is valid JSON\", function () {\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users?limit=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "abc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Get User by ID - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains required user fields\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"id\");\r",
+                  "    pm.expect(response).to.have.property(\"firstName\");\r",
+                  "    pm.expect(response).to.have.property(\"lastName\");\r",
+                  "    pm.expect(response).to.have.property(\"email\");\r",
+                  "    pm.expect(response).to.have.property(\"username\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned user ID matches requested ID\", function () {\r",
+                  "    const expectedUserId = Number(pm.environment.get(\"userId\"));\r",
+                  "    pm.expect(response.id).to.eql(expectedUserId);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Get User by ID - Negative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Error response contains message\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"message\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Error message is not empty\", function () {\r",
+                  "    pm.expect(response.message).to.be.a(\"string\").and.not.empty;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/209",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "209"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 - Add User - Positive",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Random First Name\r",
+                  "let firstName = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+                  "\r",
+                  "// Random Last Name\r",
+                  "let lastName = pm.variables.replaceIn('{{$randomLastName}}');\r",
+                  "\r",
+                  "// Random Email\r",
+                  "let email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`;\r",
+                  "\r",
+                  "// Random Age\r",
+                  "let age = Math.floor(Math.random() * (60 - 20 + 1)) + 20;\r",
+                  "\r",
+                  "// Set Variables\r",
+                  "pm.variables.set(\"FirstName\", firstName);\r",
+                  "pm.variables.set(\"LastName\", lastName);\r",
+                  "pm.variables.set(\"Email\", email);\r",
+                  "pm.variables.set(\"Age\", age);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "const requestBody = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains generated ID\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response data matches request payload\", function () {\r",
+                  "    pm.expect(response.firstName).to.eql(requestBody.firstName);\r",
+                  "    pm.expect(response.lastName).to.eql(requestBody.lastName);\r",
+                  "    pm.expect(response.age).to.eql(requestBody.age);\r",
+                  "    pm.expect(response.email).to.eql(requestBody.email);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{FirstName}}\",\r\n  \"lastName\": \"{{LastName}}\",\r\n  \"age\": {{Age}},\r\n  \"email\": \"{{Email}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 - Add User - Negative Empty Payload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\n\r\npm.test(\"Response time is less than or equal to 3000 ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r\n});\r\n\r\npm.test(\"Content-Type is application/json\", function () {\r\n    pm.expect(pm.response.headers.get(\"Content-Type\"))\r\n        .to.include(\"application/json\");\r\n});\r\n\r\npm.test(\"Response body is valid JSON\", function () {\r\n    pm.expect(response).to.be.an(\"object\");\r\n});\r\n\r\npm.test(\"Capture API behavior for empty payload\", function () {\r\n    pm.expect(pm.response.code).to.be.oneOf([201, 400, 422]);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 - Update User - Positive",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Random First Name\r",
+                  "let firstName = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+                  "\r",
+                  "// Random Last Name\r",
+                  "let lastName = pm.variables.replaceIn('{{$randomLastName}}');\r",
+                  "\r",
+                  "// Random Age (20 - 60)\r",
+                  "let age = Math.floor(Math.random() * (60 - 20 + 1)) + 20;\r",
+                  "\r",
+                  "// Set variables\r",
+                  "pm.variables.set(\"updatedFirstName\", firstName);\r",
+                  "pm.variables.set(\"updatedLastName\", lastName);\r",
+                  "pm.variables.set(\"updatedAge\", age);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "const requestBody = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains user ID\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned user ID matches requested ID\", function () {\r",
+                  "    const expectedUserId = Number(pm.environment.get(\"userId\"));\r",
+                  "    pm.expect(response.id).to.eql(expectedUserId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated data matches request payload\", function () {\r",
+                  "    pm.expect(response.firstName).to.eql(requestBody.firstName);\r",
+                  "    pm.expect(response.lastName).to.eql(requestBody.lastName);\r",
+                  "    pm.expect(response.age).to.eql(requestBody.age);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{updatedFirstName}}\",\r\n  \"lastName\": \"{{updatedLastName}}\",\r\n  \"age\": {{updatedAge}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 - Update User - Negative",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Random First Name\r",
+                  "let firstName = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+                  "\r",
+                  "// Random Last Name\r",
+                  "let lastName = pm.variables.replaceIn('{{$randomLastName}}');\r",
+                  "\r",
+                  "// Random Age (20 - 60)\r",
+                  "let age = Math.floor(Math.random() * (60 - 20 + 1)) + 20;\r",
+                  "\r",
+                  "// Set variables\r",
+                  "pm.variables.set(\"updatedFirstName\", firstName);\r",
+                  "pm.variables.set(\"updatedLastName\", lastName);\r",
+                  "pm.variables.set(\"updatedAge\", age);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is less than or equal to 3000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is application/json\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\"))\r",
+                  "        .to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Error response contains message\", function () {\r",
+                  "    pm.expect(response).to.have.property(\"message\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Error message is not empty\", function () {\r",
+                  "    pm.expect(response.message).to.be.a(\"string\").and.not.empty;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{updatedFirstName}}\",\r\n  \"lastName\": \"{{updatedLastName}}\",\r\n  \"age\": {{updatedAge}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/209",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "209"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 - Delete User - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\n\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response time is less than or equal to 3000 ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r\n});\r\n\r\npm.test(\"Content-Type is application/json\", function () {\r\n    pm.expect(pm.response.headers.get(\"Content-Type\"))\r\n        .to.include(\"application/json\");\r\n});\r\n\r\npm.test(\"Deleted user ID matches requested ID\", function () {\r\n    const expectedUserId = Number(pm.environment.get(\"userId\"));\r\n    pm.expect(response.id).to.eql(expectedUserId);\r\n});\r\n\r\npm.test(\"Response contains isDeleted field\", function () {\r\n    pm.expect(response).to.have.property(\"isDeleted\");\r\n});\r\n\r\npm.test(\"isDeleted is true\", function () {\r\n    pm.expect(response.isDeleted).to.eql(true);\r\n});\r\n\r\npm.test(\"Response contains deletedOn field\", function () {\r\n    pm.expect(response).to.have.property(\"deletedOn\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12 - Delete User - Negative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\n\r\npm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Response time is less than or equal to 3000 ms\", function () {\r\n    pm.expect(pm.response.responseTime).to.be.at.most(3000);\r\n});\r\n\r\npm.test(\"Content-Type is application/json\", function () {\r\n    pm.expect(pm.response.headers.get(\"Content-Type\"))\r\n        .to.include(\"application/json\");\r\n});\r\n\r\npm.test(\"Error response contains message\", function () {\r\n    pm.expect(response).to.have.property(\"message\");\r\n});\r\n\r\npm.test(\"Error message is not empty\", function () {\r\n    pm.expect(response.message).to.be.a(\"string\").and.not.empty;\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/209",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "209"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
